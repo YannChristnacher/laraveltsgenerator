@@ -1,12 +1,12 @@
 <?php
 
-namespace VendorName\Skeleton\Commands;
+namespace Ycp\LaravelTsGenerator\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class LaravelTsGeneratorCommand extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'laraveltsgenerator';
 
     public $description = 'My command';
 
