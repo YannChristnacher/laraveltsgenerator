@@ -18,8 +18,6 @@ class LaravelTsGeneratorServiceProvider extends PackageServiceProvider
         $package
             ->name('laraveltsgenerator')
             ->hasConfigFile()
-            ->hasViews()
-            ->hasMigration('create_laraveltsgenerator_table')
             ->hasCommand(LaravelTsGeneratorCommand::class);
     }
 }

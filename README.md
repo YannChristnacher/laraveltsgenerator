@@ -1,84 +1,127 @@
-# This is my package laraveltsgenerator
+# Laravel TypeScript Generator
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/ycp/laraveltsgenerator.svg?style=flat-square)](https://packagist.org/packages/ycp/laraveltsgenerator)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/ycp/laraveltsgenerator/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/ycp/laraveltsgenerator/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/ycp/laraveltsgenerator/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/ycp/laraveltsgenerator/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/ycp/laraveltsgenerator.svg?style=flat-square)](https://packagist.org/packages/ycp/laraveltsgenerator)
-
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
-
-## Support us
-
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/LaravelTsGenerator.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/LaravelTsGenerator)
-
-We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
-
-We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
+Un package Laravel pour générer automatiquement des interfaces TypeScript à partir de vos modèles Eloquent, enums et classes PHP.
 
 ## Installation
 
-You can install the package via composer:
+```bash
+composer require ycp/laravel-ts-generator
+```
+## Configuration
+
+Publiez le fichier de configuration :
 
 ```bash
-composer require ycp/laraveltsgenerator
+php artisan vendor:publish --provider="Ycp\LaravelTsGenerator\LaravelTsGeneratorServiceProvider"
 ```
+Cela créera le fichier `config/laravel-ts-generator.php` où vous pourrez configurer :
 
-You can publish and run the migrations with:
+- Les différents points d'entrées des fichiers
+- Les options de génération
+
+## Utilisation
+
+### Commande de base
 
 ```bash
-php artisan vendor:publish --tag="laraveltsgenerator-migrations"
-php artisan migrate
+php artisan ts:generate
 ```
 
-You can publish the config file with:
+## Configuration des sources
+Dans le fichier de configuration, vous pouvez spécifier les différentes sources disponibles
 
-```bash
-php artisan vendor:publish --tag="laraveltsgenerator-config"
-```
-
-This is the contents of the published config file:
-
+### Par dossiers
 ```php
-return [
-];
+"entries" => [
+    // Une entrée est défini par une clé et un tableau de valeur
+    "base" => [
+    
+        // Les différentes sources
+        "input" => [
+            
+            // Specifié par classe
+            // ex: MyModel::class
+            "specified_class" => [],
+            
+            // Spécifié par namespace de dossier
+            // Ex : App/Models
+            "namespaces" => [],
+            
+            // Spécifié par chemin direct (dossier ou fichier)
+            // Ex : app/Models/MyModel.php
+            // Ex : app/Models
+            "paths" => [],
+        ],
+        
+        // Provider qui définit la logique de génération pour cette entrée
+        "provider" => \Ycp\LaravelTsGenerator\Application\Providers\ClassProvider::class
+    ]
+],
 ```
 
-Optionally, you can publish the views using
+## Exemples de génération
 
-```bash
-php artisan vendor:publish --tag="laraveltsgenerator-views"
-```
-
-## Usage
-
+### Modèle Eloquent
 ```php
-$laravelTsGenerator = new Ycp\LaravelTsGenerator();
-echo $laravelTsGenerator->echoPhrase('Hello, Ycp!');
+class User extends Model
+{
+    
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+}
 ```
 
-## Testing
-
-```bash
-composer test
+Génère :
+```typescript
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  created_at?: string;
+  updated_at?: string;
+  posts?: Post[];
+}
+```
+### Enum PHP
+```php
+enum UserStatus: string
+{
+    case ACTIVE = 'active';
+    case INACTIVE = 'inactive';
+    case PENDING = 'pending';
+}
 ```
 
-## Changelog
+Génère :
+```typescript
+export enum UserStatus {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  PENDING = 'pending'
+}
+```
 
-Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
+### DTO/Data Class
+```php
+class UserData
+{
+    public function __construct(
+        public string $name,
+        public string $email,
+        public ?int $age = null
+    ) {}
+}
+```
 
-## Contributing
+Génère :
+```typescript
+export interface UserData {
+  name: string;
+  email: string;
+  age?: number|null;
+}
+```
 
-Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
-## Security Vulnerabilities
-
-Please review [our security policy](../../security/policy) on how to report security vulnerabilities.
-
-## Credits
-
-- [Yann Christnacher](https://github.com/)
-- [All Contributors](../../contributors)
-
-## License
-
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
